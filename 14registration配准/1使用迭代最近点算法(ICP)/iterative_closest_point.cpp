@@ -62,7 +62,16 @@ int main(int argc, char **argv)
     pcl::PointCloud<pcl::PointXYZ> Final;
     icp.align(Final);
     std::cout << "has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore() << std::endl;
+    // getFinalTransformation返回转换矩阵RT，我们可以尝试根据这个矩阵来变换我们的初始矩阵到目标点云的坐标系
     const pcl::Registration<pcl::PointXYZ, pcl::PointXYZ, float>::Matrix4 &matrix = icp.getFinalTransformation();
     std::cout << matrix << std::endl;
+
+    // 尝试调用transformPointCloud函数，将cloud_in变换到cloud_out的坐标系下
+    pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>()); // 存储结果
+    pcl::transformPointCloud(*cloud_in, *transformed_cloud, matrix);
+    std::cout << "手动Transformed " << transformed_cloud->points.size() << " data points:"
+              << std::endl;
+    for (size_t i = 0; i < transformed_cloud->points.size(); ++i)                         //打印构造出来的目标点云
+        std::cout << "    " << transformed_cloud->points[i].x << " " << transformed_cloud->points[i].y << " " << transformed_cloud->points[i].z << std::endl;
     return (0);
 }
