@@ -58,7 +58,7 @@ main (int argc, char** argv)
 
   // 根据输入数据的尺度设置NDT相关参数
 
-  ndt.setTransformationEpsilon (0.01);   //为终止条件设置最小转换差异
+  ndt.setTransformationEpsilon (0.001);   //为终止条件设置最小转换差异
   
   ndt.setStepSize (0.1);    //为more-thuente线搜索设置最大步长
 
@@ -67,7 +67,7 @@ main (int argc, char** argv)
 
   //设置匹配迭代的最大次数，这个参数控制程序运行的最大迭代次数，一般来说这个限制值之前优化程序会在epsilon变换阀值下终止
   //添加最大迭代次数限制能够增加程序的鲁棒性阻止了它在错误的方向上运行时间过长
-  ndt.setMaximumIterations (35);
+  ndt.setMaximumIterations (50);
 
   ndt.setInputSource (filtered_cloud);  //源点云
   // Setting point cloud to be aligned to.
@@ -81,7 +81,7 @@ main (int argc, char** argv)
   // 计算需要的刚体变换以便将输入的源点云匹配到目标点云
   pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud (new pcl::PointCloud<pcl::PointXYZ>);
   ndt.align (*output_cloud, init_guess);
-   //这个地方的output_cloud不能作为最终的源点云变换，因为上面对点云进行了滤波处理
+  //这个地方的output_cloud不能作为最终的源点云变换，因为上面对点云进行了滤波处理，相当于保存下滤波后的点云配准结果
   std::cout << "Normal Distributions Transform has converged:" << ndt.hasConverged ()
             << " score: " << ndt.getFitnessScore () << std::endl;
 
