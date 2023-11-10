@@ -82,8 +82,8 @@ main (int argc,
     }
 
     pcl::console::TicToc time;
-    time.tic ();
-    if (pcl::io::loadPLYFile (argv[1], *cloud_in) < 0)
+    time.tic (); // 计时开始，对应time.toc结束时间
+    if (pcl::io::loadPLYFile (argv[1], *cloud_in) < 0)  // 加载原始要配准的点云到cloud_in
     {
         PCL_ERROR ("Error loading cloud %s.\n", argv[1]);
         return (-1);
@@ -112,9 +112,9 @@ main (int argc,
     std::cout << "Applying this rigid transformation to: cloud_in -> cloud_icp" << std::endl;
     print4x4Matrix (transformation_matrix);
 
-    // Executing the transformation
+    // Executing the transformation   对原始点云cloud_in做一个旋转平移得到cloud_icp相当于后面做配准的目标点云
     pcl::transformPointCloud (*cloud_in, *cloud_icp, transformation_matrix);
-    *cloud_tr = *cloud_icp;  // We backup cloud_icp into cloud_tr for later use
+    *cloud_tr = *cloud_icp;  // 备份一下cloud_icp
 
     // 这是ICP对象的创建。 我们设置ICP算法的参数。
     // setMaximumIterations（iterations）设置要执行的初始迭代次数（默认值为1）。
@@ -124,7 +124,7 @@ main (int argc,
     time.tic ();
     pcl::IterativeClosestPoint<PointT, PointT> icp;
     icp.setMaximumIterations (iterations);
-    icp.setInputSource (cloud_icp);
+    icp.setInputSource (cloud_icp);   // 这里相当于把目标点云转换到源点云坐标系下
     icp.setInputTarget (cloud_in);
     icp.align (*cloud_icp);
     icp.setMaximumIterations (1);  // We set this variable to 1 for the next time we will call .align () function
